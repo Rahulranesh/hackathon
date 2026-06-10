@@ -31,6 +31,19 @@ test('venues endpoint returns source-backed venue records', async () => {
   }
 });
 
+test('users endpoint returns persisted selectable users', async () => {
+  const response = await fetch(`${baseUrl}/users`);
+  const users = await response.json();
+
+  assert.equal(response.status, 200);
+  assert.ok(users.length >= 3);
+  assert.deepEqual(
+    users.map((user) => user.id),
+    ['u1', 'u2', 'u3'],
+  );
+  assert.ok(users.every((user) => user.name && user.phone));
+});
+
 test('slot listing validates date and returns availability fields', async () => {
   const badResponse = await fetch(`${baseUrl}/venues/1/slots?date=10-06-2026`);
   assert.equal(badResponse.status, 400);

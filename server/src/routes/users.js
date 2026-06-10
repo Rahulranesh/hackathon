@@ -4,6 +4,11 @@ const { auth } = require('../middleware/auth');
 
 const router = express.Router();
 
+router.get('/', (_req, res) => {
+  const users = db.prepare('SELECT id, name, phone FROM users ORDER BY id').all();
+  res.json(users);
+});
+
 router.get('/:id/bookings', auth, (req, res) => {
   if (req.params.id !== req.user.id) {
     return res.status(403).json({ error: 'Forbidden' });

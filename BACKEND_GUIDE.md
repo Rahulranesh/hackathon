@@ -10,7 +10,7 @@ The hard rule is: one slot for one date can only have one booking. This is enfor
 - Framework: Express
 - Database: SQLite through built-in `node:sqlite`
 - Persistence: local `quickslot.db`
-- Auth: hardcoded users with `X-User-Id` header
+- Auth: DB-backed demo users with `X-User-Id` header
 - Concurrency protection: SQLite unique constraint on `(slot_id, booking_date)`
 
 Why this stack:
@@ -71,6 +71,25 @@ Seeded source-backed examples:
 
 These records are real Bengaluru sports venues seeded into local SQLite so the app can run fully offline during demo while still using non-placeholder venue data.
 
+### `users`
+
+Stores selectable demo users in SQLite.
+
+Columns:
+
+- `id`: text primary key used in `X-User-Id`
+- `name`: display name shown in Flutter login
+- `phone`: demo phone number
+- `created_at`: timestamp
+
+Seeded users:
+
+- `u1`: Alice Kumar
+- `u2`: Bob Mathew
+- `u3`: Charlie Rao
+
+These are persisted rows, not Flutter constants or in-memory backend objects.
+
 ### `slots`
 
 Stores recurring hourly slot templates for each venue.
@@ -100,7 +119,7 @@ Columns:
 
 - `id`: integer primary key
 - `slot_id`: foreign key to `slots.id`
-- `user_id`: hardcoded user id, for example `u1`
+- `user_id`: persisted user id from `users.id`, for example `u1`
 - `booking_date`: date string in `YYYY-MM-DD`
 - `created_at`: timestamp
 
@@ -416,22 +435,18 @@ Why seed is idempotent:
 
 ### `server/src/middleware/auth.js`
 
-Simple auth middleware.
-
-Users:
-
-- `u1`: Alice
-- `u2`: Bob
-- `u3`: Charlie
+Simple auth middleware using the SQLite `users` table.
 
 Logic:
 
 1. Read `x-user-id` request header.
-2. If missing or unknown, return `401`.
-3. Attach user object to `req.user`.
-4. Continue to route handler.
+2. If missing, return `401`.
+3. Query `users` by id.
+4. If no row exists, return `401`.
+5. Attach user object to `req.user`.
+6. Continue to route handler.
 
-Defense point: this matches the brief. Building full auth would waste time and increase demo risk.
+Defense point: this keeps auth light as requested, but user identity still comes from persistent backend data.
 
 ### `server/src/routes/venues.js`
 
@@ -488,7 +503,13 @@ Important line of thinking:
 
 ### `server/src/routes/users.js`
 
-User booking route.
+User routes.
+
+`GET /users`:
+
+- No auth required.
+- Returns selectable users for the login screen.
+- Reads from the SQLite `users` table.
 
 `GET /users/:id/bookings`:
 
@@ -629,7 +650,7 @@ Important caveat:
 
 Short architecture answer:
 
-"The backend is Express plus SQLite. I seed venues and hourly slot templates. Bookings are date-specific rows. The no-double-booking guarantee is a unique database constraint on `(slot_id, booking_date)`. The booking endpoint attempts a single insert; if the database rejects it, I return `409 Conflict`. I also added a concurrency test that fires two simultaneous booking requests and proves exactly one succeeds."
+"The backend is Express plus SQLite. I seed real source-backed venues, DB-backed demo users, and hourly slot templates. Bookings are date-specific rows. The no-double-booking guarantee is a unique database constraint on `(slot_id, booking_date)`. The booking endpoint attempts a single insert; if the database rejects it, I return `409 Conflict`. I also added a concurrency test that fires two simultaneous booking requests and proves exactly one succeeds."
 
 Why not app-level locking:
 
@@ -648,7 +669,7 @@ Why SQLite is acceptable:
 
 Safe small changes:
 
-- Add a new hardcoded user in `auth.js` and Flutter `constants.dart`.
+- Add a new seeded user in `server/src/db/seed.js`.
 - Add a sport field display in `GET /venues`.
 - Add a new venue in `seed.js`.
 - Change opening hours by editing the seed slot loop.

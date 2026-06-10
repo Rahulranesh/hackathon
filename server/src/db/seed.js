@@ -1,5 +1,11 @@
 const { db } = require('./schema');
 
+const USERS = [
+  { id: 'u1', name: 'Alice Kumar', phone: '+91-90000-00001' },
+  { id: 'u2', name: 'Bob Mathew', phone: '+91-90000-00002' },
+  { id: 'u3', name: 'Charlie Rao', phone: '+91-90000-00003' },
+];
+
 const VENUES = [
   {
     legacyName: 'Smash Arena',
@@ -73,6 +79,8 @@ const VENUES = [
 ];
 
 function seed() {
+  seedUsers();
+
   const existingVenues = db.prepare('SELECT COUNT(*) as count FROM venues').get();
 
   if (existingVenues.count === 0) {
@@ -95,6 +103,20 @@ function seed() {
       const venueId = insertVenue(venue);
       seedSlotsForVenue(venueId);
     }
+  }
+}
+
+function seedUsers() {
+  const upsertUser = db.prepare(
+    `INSERT INTO users (id, name, phone)
+     VALUES (?, ?, ?)
+     ON CONFLICT(id) DO UPDATE SET
+       name = excluded.name,
+       phone = excluded.phone`,
+  );
+
+  for (const user of USERS) {
+    upsertUser.run(user.id, user.name, user.phone);
   }
 }
 
@@ -163,4 +185,4 @@ function seedSlotsForVenue(venueId) {
   }
 }
 
-module.exports = { seed, VENUES };
+module.exports = { seed, VENUES, USERS };

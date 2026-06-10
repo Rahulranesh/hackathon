@@ -12,7 +12,7 @@ The main rule is: widgets do not call HTTP directly. Screens call providers, pro
 ## Runtime Flow
 
 1. `main.dart` initializes Flutter, AdMob, local notifications, repositories, and providers.
-2. `LoginScreen` lets the judge pick one hardcoded demo user.
+2. `LoginScreen` fetches persisted demo users from `GET /users` and lets the judge pick one.
 3. `VenueListScreen` fetches venues from `GET /venues`.
 4. `VenueDetailScreen` fetches slots for a selected date from `GET /venues/:id/slots`.
 5. User taps an available `SlotTile`, confirms in a bottom sheet, and sends `POST /bookings`.
@@ -44,12 +44,11 @@ Common state shape:
 
 Stores values shared across the app.
 
-- `kBaseUrl`: backend URL.
+- `kBaseUrl`: backend URL, configurable with `--dart-define=API_BASE_URL=...`.
   - Android emulator uses `http://10.0.2.2:3000`.
   - Physical device should use laptop LAN IP or deployed backend URL.
-- `kUsers`: hardcoded demo users matching backend `X-User-Id` users.
 
-Defense point: hardcoded users are acceptable because the problem statement explicitly says light auth is fine.
+Defense point: selectable users come from the backend database, not Flutter constants.
 
 ### `lib/core/result.dart`
 
@@ -91,6 +90,7 @@ Responsibilities:
 Important methods:
 
 - `getVenues()`: calls `GET /venues`.
+- `getUsers()`: calls `GET /users`.
 - `getSlots(int venueId, String date)`: calls `GET /venues/:id/slots?date=YYYY-MM-DD`.
 - `postBooking(int slotId, String date, String userId)`: calls `POST /bookings`.
 - `getUserBookings(String userId)`: calls `GET /users/:id/bookings`.
@@ -117,6 +117,18 @@ Fields:
 - `closeTime`
 
 `Venue.fromJson()` maps backend JSON to Dart object.
+
+### `lib/data/models/app_user.dart`
+
+Domain model for a selectable user.
+
+Fields:
+
+- `id`
+- `name`
+- `phone`
+
+Users are loaded from SQLite through `GET /users`.
 
 ### `lib/data/models/slot.dart`
 
@@ -182,20 +194,24 @@ Defense point: if API JSON shape changes, repository/model layer is the only pla
 
 ### `lib/presentation/providers/user_provider.dart`
 
-Stores selected demo user.
+Loads DB-backed demo users and stores the selected user.
 
 State:
 
 - `_userId`
 - `_userName`
+- `ViewState state`
+- `List<AppUser> users`
+- `String? errorMessage`
 - `isLoggedIn`
 
 Methods:
 
+- `fetchUsers()`
 - `login(id, name)`
 - `logout()`
 
-This keeps user selection available across screens.
+This keeps user selection available across screens after users are fetched from the backend.
 
 ### `lib/presentation/providers/venue_provider.dart`
 
@@ -297,11 +313,12 @@ First screen.
 What it does:
 
 - Shows QuickSlot branding.
-- Lists hardcoded users from `kUsers`.
+- Loads selectable users from `GET /users`.
+- Shows skeleton/error/empty states for user loading.
 - On tap, saves selected user in `UserProvider`.
 - Navigates to `VenueListScreen`.
 
-There is no password/auth flow because the hackathon brief allows hardcoded users.
+There is no password/OTP flow because the hackathon brief allows light auth. The user records themselves are persisted backend rows.
 
 ### `lib/presentation/screens/venue_list_screen.dart`
 
@@ -507,7 +524,7 @@ Defense point: central theme avoids duplicated styling and keeps the app visuall
 If asked to make a small live change, these are safe places:
 
 - Change polling interval in `slot_provider.dart`.
-- Add a fourth hardcoded user in `constants.dart` and backend `auth.js`.
+- Add a fourth seeded user in `server/src/db/seed.js`.
 - Change slot tile colors in `app_theme.dart`.
 - Add a new message in `_showTakenSnackbar()`.
 - Add another field to `VenueCard`.

@@ -6,9 +6,18 @@ A sports slot booking app (badminton courts & football turf). Browse venues, pic
 
 ## Data Note
 
-The backend uses real persisted SQLite data. The starter venues are source-backed Bengaluru venues, not placeholder names: Krishna Premier Badminton Arena, The Bull Ring, Elite Badminton Arena, Golden Leg, and The Majesstine Sports. Venue metadata includes locality and source fields from public venue listings such as Playo, KheloMore, and official venue pages.
+The backend uses real persisted SQLite data in `server/quickslot.db` through Node's built-in `node:sqlite`. The starter venues are source-backed Bengaluru venues, not placeholder names: Krishna Premier Badminton Arena, The Bull Ring, Elite Badminton Arena, Golden Leg, and The Majesstine Sports. Venue metadata includes locality and source fields from public venue listings such as Playo, KheloMore, and official venue pages.
 
-Slot availability and bookings are not mocked. They are calculated from the `slots` and `bookings` SQLite tables.
+Slot availability, selectable users, and bookings are not mocked. They are calculated from the `users`, `venues`, `slots`, and `bookings` SQLite tables. The app does not use fake in-memory booking state.
+
+What "real" means in this hackathon build:
+
+- Real local persistence: SQLite file survives server restarts.
+- Real API calls: Flutter talks to Express over HTTP.
+- Real concurrency guard: SQLite unique constraint prevents double-booking.
+- Real seeded venue records: source-backed public venue listings.
+- Real DB-backed demo users: login users come from `GET /users`, not Flutter constants.
+- Not production auth/payments: full OTP/JWT/payment/subscription systems are intentionally cut for scope.
 
 Seed data sources:
 
@@ -51,6 +60,54 @@ flutter run
 
 > If using a **physical device**: update `lib/core/constants.dart` — change `10.0.2.2` to your laptop's local IP (e.g. `192.168.1.x`) or your deployed Railway/Render URL.
 > If using an **Android emulator**: `10.0.2.2` already maps to your host machine.
+
+You can also pass the backend URL without editing code:
+
+```bash
+flutter run --dart-define=API_BASE_URL=http://YOUR_LAPTOP_IP:3000
+```
+
+---
+
+## What You Need To Do
+
+Backend side:
+
+- Install Node.js 22+ because `node:sqlite` is used.
+- Run `cd server && npm install`.
+- Start backend with `npm start`.
+- Keep the backend terminal running during demo.
+- Run `npm test` before demo; it verifies API, auth, cancellation, and double-booking behavior.
+- For physical phones, make sure laptop and phones are on the same Wi-Fi.
+- If macOS firewall asks, allow Node incoming connections.
+- Do not delete `server/quickslot.db` during demo unless you intentionally want a fresh seed.
+
+Frontend side:
+
+- Run `cd hackathon && flutter pub get`.
+- Android emulator: run `flutter run`; default URL works.
+- Physical phone: run `flutter run --dart-define=API_BASE_URL=http://YOUR_LAPTOP_IP:3000`.
+- Use two devices with different DB-backed users, for example Alice Kumar and Bob Mathew.
+- Open the same venue/date/slot on both devices for the live double-booking test.
+- Expect one phone to show success and the other to show the graceful "slot taken" message.
+- Run `flutter analyze` and `flutter test` before demo.
+
+---
+
+## Bonus Scope Attempted
+
+Attempted exactly two bonuses after the core flow worked:
+
+- Slot status updates via polling: `SlotProvider` refreshes venue slots every 10 seconds and immediately after booking success/conflict.
+- Tests: backend API tests plus the double-booking concurrency test, and the default Flutter widget test.
+
+Not attempted as bonus scope:
+
+- Offline My Bookings cache.
+- Dockerized backend.
+- Time-of-day slot filter.
+
+Reason: the evaluation strongly favors a smaller app that is correct, explainable, and stable during the live double-booking test.
 
 ---
 

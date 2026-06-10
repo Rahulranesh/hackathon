@@ -3,14 +3,13 @@ import 'package:http/http.dart' as http;
 import '../../core/constants.dart';
 import '../../core/result.dart';
 
-
 class ApiService {
   final String _base = kBaseUrl;
 
   Map<String, String> _headers(String userId) => {
-        'Content-Type': 'application/json',
-        'X-User-Id': userId,
-      };
+    'Content-Type': 'application/json',
+    'X-User-Id': userId,
+  };
 
   Future<Result<T>> _get<T>(
     String path,
@@ -76,23 +75,31 @@ class ApiService {
   Future<Result<List<dynamic>>> getVenues() =>
       _get('/venues', (b) => b as List<dynamic>);
 
+  Future<Result<List<dynamic>>> getUsers() =>
+      _get('/users', (b) => b as List<dynamic>);
+
   Future<Result<Map<String, dynamic>>> getSlots(int venueId, String date) =>
-      _get('/venues/$venueId/slots?date=$date', (b) => b as Map<String, dynamic>);
+      _get(
+        '/venues/$venueId/slots?date=$date',
+        (b) => b as Map<String, dynamic>,
+      );
 
   Future<Result<Map<String, dynamic>>> postBooking(
     int slotId,
     String date,
     String userId,
-  ) =>
-      _post(
-        '/bookings',
-        {'slot_id': slotId, 'booking_date': date},
-        (b) => b as Map<String, dynamic>,
-        userId,
-      );
+  ) => _post(
+    '/bookings',
+    {'slot_id': slotId, 'booking_date': date},
+    (b) => b as Map<String, dynamic>,
+    userId,
+  );
 
-  Future<Result<List<dynamic>>> getUserBookings(String userId) =>
-      _get('/users/$userId/bookings', (b) => b as List<dynamic>, userId: userId);
+  Future<Result<List<dynamic>>> getUserBookings(String userId) => _get(
+    '/users/$userId/bookings',
+    (b) => b as List<dynamic>,
+    userId: userId,
+  );
 
   Future<Result<String>> deleteBooking(int bookingId, String userId) =>
       _delete('/bookings/$bookingId', userId);

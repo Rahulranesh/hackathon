@@ -17,7 +17,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await MobileAds.instance.initialize();
   await NotificationService().init();
-  
+
   final api = ApiService();
   final venueRepo = VenueRepository(api);
   final bookingRepo = BookingRepository(api);
@@ -25,7 +25,7 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => UserProvider(api)),
         ChangeNotifierProvider(create: (_) => VenueProvider(venueRepo)),
         ChangeNotifierProvider(create: (_) => SlotProvider(venueRepo)),
         ChangeNotifierProvider(create: (_) => BookingProvider(bookingRepo)),
@@ -40,9 +40,9 @@ class QuickSlotApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-        title: 'QuickSlot',
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.dark,
-        home: const LoginScreen(),
-      );
+    title: 'QuickSlot',
+    debugShowCheckedModeBanner: false,
+    theme: AppTheme.dark,
+    home: const LoginScreen(),
+  );
 }

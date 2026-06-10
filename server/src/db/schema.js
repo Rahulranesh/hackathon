@@ -23,6 +23,13 @@ function initDb() {
       close_time TEXT DEFAULT '22:00'
     );
 
+    CREATE TABLE IF NOT EXISTS users (
+      id          TEXT PRIMARY KEY,
+      name        TEXT NOT NULL,
+      phone       TEXT,
+      created_at  DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
     CREATE TABLE IF NOT EXISTS slots (
       id         INTEGER PRIMARY KEY AUTOINCREMENT,
       venue_id   INTEGER NOT NULL REFERENCES venues(id),
@@ -33,7 +40,7 @@ function initDb() {
     CREATE TABLE IF NOT EXISTS bookings (
       id           INTEGER PRIMARY KEY AUTOINCREMENT,
       slot_id      INTEGER NOT NULL REFERENCES slots(id),
-      user_id      TEXT    NOT NULL,
+      user_id      TEXT    NOT NULL REFERENCES users(id),
       booking_date TEXT    NOT NULL,
       created_at   DATETIME DEFAULT CURRENT_TIMESTAMP,
       UNIQUE(slot_id, booking_date)
