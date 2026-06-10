@@ -11,6 +11,34 @@ A sports slot booking app (badminton courts & football turf) that lets users bro
 
 ---
 
+## 📱 App Screenshots
+
+<div align="center">
+
+### Login Screen
+<img src="screenshots/01_login_screen.png" width="250" alt="Login Screen with 3D animations"/>
+
+### Venue List & Venue Detail
+<img src="screenshots/02_venue_list.png" width="250" alt="Venue List"/> <img src="screenshots/03_venue_detail.png" width="250" alt="Venue Detail"/>
+
+### Slot Selection & Booking
+<img src="screenshots/06_slot_selection.png" width="250" alt="Slot Selection"/> <img src="screenshots/04_booking_confirm.png" width="250" alt="Booking Confirmation"/>
+
+### My Bookings
+<img src="screenshots/05_my_bookings.png" width="250" alt="My Bookings"/>
+
+</div>
+
+**Features Showcased:**
+- 🎨 Professional Blue/Orange gradient design
+- 💫 3D interactive cards with depth effects
+- 🔔 Firebase Cloud Messaging notifications
+- ✨ Smooth animations and transitions
+- 📅 Intuitive date picker and slot grid
+- 🎯 Clear booking status indicators
+
+---
+
 ## Data Note
 
 The backend uses real persisted SQLite data in `server/quickslot.db` through Node's built-in `node:sqlite`. The starter venues are source-backed Bengaluru venues, not placeholder names: Krishna Premier Badminton Arena, The Bull Ring, Elite Badminton Arena, Golden Leg, and The Majesstine Sports. Venue metadata includes locality and source fields from public venue listings such as Playo, KheloMore, and official venue pages.
