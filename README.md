@@ -162,7 +162,7 @@ State management: **Provider** — chosen for simplicity, zero boilerplate, and 
 
 | Cut | Reason |
 |-----|--------|
-| JWT auth | Hardcoded users + `X-User-Id` header is sufficient for the demo scope |
+| JWT auth | DB-backed demo users + `X-User-Id` header are sufficient for the demo scope |
 | Pagination | 5 venues × 16 slots fits on one screen |
 | WebSockets | 10s polling plus immediate refresh achieves the same demo effect with zero infrastructure |
 | Dockerized backend | Adds 30 min setup cost with no benefit for local demo |
@@ -172,7 +172,7 @@ State management: **Provider** — chosen for simplicity, zero boilerplate, and 
 
 ## What We'd Do With One More Day
 
-- Real Firebase Auth (replace hardcoded users)
+- Real Firebase/Auth0 auth with OTP or OAuth
 - WebSocket for instant slot updates instead of polling
 - Admin panel to manage venues and slots
 - Recurring slot templates (auto-generate slots daily)
