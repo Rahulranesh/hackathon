@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../core/constants.dart';
-import '../core/result.dart';
+import '../../core/constants.dart';
+import '../../core/result.dart';
+
 
 class ApiService {
   final String _base = kBaseUrl;
