@@ -35,9 +35,9 @@ class NotificationService {
     );
 
     await _localNotifications.initialize(
-      initSettings,
-      onDidReceiveNotificationResponse: (NotificationResponse response) {
-        _onNotificationTapped(response);
+      settings: initSettings,
+      onDidReceiveNotificationResponse: (response) {
+        developer.log('🔔 Notification tapped: ${response.payload}', name: 'NotificationService');
       },
     );
   }
@@ -62,10 +62,6 @@ class NotificationService {
       _fcmToken = newToken;
       developer.log('🔄 FCM Token refreshed: $newToken', name: 'NotificationService');
     });
-  }
-
-  void _onNotificationTapped(NotificationResponse response) {
-    developer.log('🔔 Notification tapped: ${response.payload}', name: 'NotificationService');
   }
 
   void _handleForegroundMessage(RemoteMessage message) {
@@ -114,10 +110,10 @@ class NotificationService {
     );
 
     await _localNotifications.show(
-      DateTime.now().millisecond,
-      '🎉 Booking Confirmed!',
-      '$sport at $venueName\n📅 $date at $time',
-      details,
+      id: DateTime.now().millisecond,
+      title: '🎉 Booking Confirmed!',
+      body: '$sport at $venueName\n📅 $date at $time',
+      notificationDetails: details,
       payload: 'booking_confirmed',
     );
   }
@@ -148,10 +144,10 @@ class NotificationService {
     );
 
     await _localNotifications.show(
-      DateTime.now().millisecond,
-      'Booking Cancelled',
-      'Your booking at $venueName for $time has been cancelled.',
-      details,
+      id: DateTime.now().millisecond,
+      title: 'Booking Cancelled',
+      body: 'Your booking at $venueName for $time has been cancelled.',
+      notificationDetails: details,
       payload: 'booking_cancelled',
     );
   }
@@ -182,10 +178,10 @@ class NotificationService {
     );
 
     await _localNotifications.show(
-      DateTime.now().millisecond,
-      '⚠️ Slot Already Taken',
-      'Sorry, $venueName at $time was just booked by someone else.',
-      details,
+      id: DateTime.now().millisecond,
+      title: '⚠️ Slot Already Taken',
+      body: 'Sorry, $venueName at $time was just booked by someone else.',
+      notificationDetails: details,
       payload: 'slot_taken',
     );
   }
@@ -216,10 +212,10 @@ class NotificationService {
     );
 
     await _localNotifications.show(
-      DateTime.now().millisecond,
-      title,
-      body,
-      details,
+      id: DateTime.now().millisecond,
+      title: title,
+      body: body,
+      notificationDetails: details,
       payload: payload,
     );
   }

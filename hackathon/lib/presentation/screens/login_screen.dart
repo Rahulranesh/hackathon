@@ -355,8 +355,8 @@ class _UserCardState extends State<_UserCard> with SingleTickerProviderStateMixi
     Navigator.pushReplacement(
       context,
       PageRouteBuilder(
-        pageBuilder: (_, animation, __) => const VenueListScreen(),
-        transitionsBuilder: (_, animation, __, child) {
+        pageBuilder: (_, animation, secondaryAnimation) => const VenueListScreen(),
+        transitionsBuilder: (_, animation, secondaryAnimation, child) {
           return FadeTransition(
             opacity: animation,
             child: SlideTransition(
