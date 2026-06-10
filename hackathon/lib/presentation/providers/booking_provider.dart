@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import '../../core/result.dart';
 import '../../data/models/booking.dart';
 import '../../data/repositories/booking_repository.dart';
 import 'venue_provider.dart';

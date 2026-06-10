@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
+import '../../core/result.dart';
 import '../../data/models/slot.dart';
 import '../../data/models/venue.dart';
 import '../../data/repositories/venue_repository.dart';
