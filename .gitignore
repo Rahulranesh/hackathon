@@ -1,0 +1,9 @@
+node_modules/
+*.db
+.dart_tool/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+*.iml
+.idea/
+.DS_Store
