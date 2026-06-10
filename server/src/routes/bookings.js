@@ -7,7 +7,7 @@ const router = express.Router();
 router.post('/', auth, (req, res) => {
   const { slot_id, booking_date } = req.body;
 
-  if (!slot_id || !booking_date) {
+  if (!Number.isInteger(slot_id) || !booking_date) {
     return res.status(400).json({ error: 'slot_id and booking_date are required' });
   }
   if (!/^\d{4}-\d{2}-\d{2}$/.test(booking_date)) {
@@ -25,7 +25,8 @@ router.post('/', auth, (req, res) => {
 
     const booking = db.prepare(`
       SELECT b.id, b.slot_id, b.user_id, b.booking_date, b.created_at,
-             s.start_time, s.end_time, v.name as venue_name, v.id as venue_id
+             s.start_time, s.end_time,
+             v.name as venue_name, v.id as venue_id, v.sport, v.address
       FROM bookings b
       JOIN slots s ON s.id = b.slot_id
       JOIN venues v ON v.id = s.venue_id

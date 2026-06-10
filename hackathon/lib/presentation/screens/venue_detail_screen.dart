@@ -91,7 +91,10 @@ class _VenueDetailScreenState extends State<VenueDetailScreen> {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [sportColor.withValues(alpha: 0.15), sportColor.withValues(alpha: 0.05)],
+                colors: [
+                  sportColor.withValues(alpha: 0.15),
+                  sportColor.withValues(alpha: 0.05),
+                ],
               ),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: sportColor.withValues(alpha: 0.2)),
@@ -110,11 +113,16 @@ class _VenueDetailScreenState extends State<VenueDetailScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(widget.venue.address,
-                          style: TextStyle(color: Colors.grey[400], fontSize: 13)),
+                      Text(
+                        widget.venue.address,
+                        style: TextStyle(color: Colors.grey[400], fontSize: 13),
+                      ),
                       const SizedBox(height: 4),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: sportColor.withValues(alpha: 0.2),
                           borderRadius: BorderRadius.circular(8),
@@ -122,8 +130,10 @@ class _VenueDetailScreenState extends State<VenueDetailScreen> {
                         child: Text(
                           widget.venue.sport.toUpperCase(),
                           style: TextStyle(
-                            color: sportColor, fontSize: 10,
-                            fontWeight: FontWeight.w700, letterSpacing: 0.8,
+                            color: sportColor,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.8,
                           ),
                         ),
                       ),
@@ -133,7 +143,10 @@ class _VenueDetailScreenState extends State<VenueDetailScreen> {
                 // slot count badge
                 if (provider.state == ViewState.data)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFF00C853).withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(10),
@@ -141,7 +154,9 @@ class _VenueDetailScreenState extends State<VenueDetailScreen> {
                     child: Text(
                       '${provider.slots.where((s) => !s.isBooked).length} open',
                       style: const TextStyle(
-                        color: Color(0xFF00C853), fontSize: 12, fontWeight: FontWeight.w700,
+                        color: Color(0xFF00C853),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
@@ -163,36 +178,41 @@ class _VenueDetailScreenState extends State<VenueDetailScreen> {
     return switch (provider.state) {
       ViewState.loading || ViewState.idle => const SlotGridSkeleton(),
       ViewState.error => AppError(
-          message: provider.errorMessage ?? 'Failed to load slots',
-          onRetry: () => _slotProvider.loadSlots(widget.venue.id),
-        ),
-      ViewState.data when provider.slots.isEmpty =>
-        const EmptyState(message: 'No slots available for this date'),
+        message: provider.errorMessage ?? 'Failed to load slots',
+        onRetry: () => _slotProvider.loadSlots(widget.venue.id),
+      ),
+      ViewState.data when provider.slots.isEmpty => const EmptyState(
+        message: 'No slots available for this date',
+      ),
       ViewState.data => RefreshIndicator(
-          color: const Color(0xFF00C853),
-          onRefresh: () => _slotProvider.refresh(widget.venue.id),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: GridView.builder(
-              physics: const AlwaysScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4,
-                mainAxisSpacing: 10,
-                crossAxisSpacing: 10,
-                childAspectRatio: 0.85,
-              ),
-              itemCount: provider.slots.length,
-              itemBuilder: (_, i) => SlotTile(
-                slot: provider.slots[i],
-                onTap: () => _onSlotTap(provider.slots[i]),
-              ).animate().fadeIn(delay: (i * 30).ms, duration: 300.ms).scale(
-                    begin: const Offset(0.8, 0.8),
-                    delay: (i * 30).ms,
-                    duration: 300.ms,
-                  ),
+        color: const Color(0xFF00C853),
+        onRefresh: () => _slotProvider.refresh(widget.venue.id),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: GridView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 4,
+              mainAxisSpacing: 10,
+              crossAxisSpacing: 10,
+              childAspectRatio: 0.85,
             ),
+            itemCount: provider.slots.length,
+            itemBuilder: (_, i) =>
+                SlotTile(
+                      slot: provider.slots[i],
+                      onTap: () => _onSlotTap(provider.slots[i]),
+                    )
+                    .animate()
+                    .fadeIn(delay: (i * 30).ms, duration: 300.ms)
+                    .scale(
+                      begin: const Offset(0.8, 0.8),
+                      delay: (i * 30).ms,
+                      duration: 300.ms,
+                    ),
           ),
         ),
+      ),
     };
   }
 }
@@ -204,7 +224,8 @@ class _DateStrip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isToday = DateFormat('yyyy-MM-dd').format(date) ==
+    final isToday =
+        DateFormat('yyyy-MM-dd').format(date) ==
         DateFormat('yyyy-MM-dd').format(DateTime.now());
 
     return Padding(
@@ -221,16 +242,29 @@ class _DateStrip extends StatelessWidget {
           ),
           child: Row(
             children: [
-              const Icon(Icons.calendar_today_rounded, size: 18, color: Color(0xFF00C853)),
+              const Icon(
+                Icons.calendar_today_rounded,
+                size: 18,
+                color: Color(0xFF00C853),
+              ),
               const SizedBox(width: 10),
-              Text(
-                DateFormat('EEEE, d MMM yyyy').format(date),
-                style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
+              Expanded(
+                child: Text(
+                  DateFormat('EEEE, d MMM yyyy').format(date),
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14,
+                  ),
+                ),
               ),
               if (isToday) ...[
                 const SizedBox(width: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFF00C853).withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(6),
@@ -238,13 +272,15 @@ class _DateStrip extends StatelessWidget {
                   child: const Text(
                     'TODAY',
                     style: TextStyle(
-                      color: Color(0xFF00C853), fontSize: 9,
-                      fontWeight: FontWeight.w800, letterSpacing: 1,
+                      color: Color(0xFF00C853),
+                      fontSize: 9,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1,
                     ),
                   ),
                 ),
               ],
-              const Spacer(),
+              const SizedBox(width: 8),
               const Icon(Icons.expand_more_rounded, color: Colors.grey),
             ],
           ),
@@ -257,26 +293,38 @@ class _DateStrip extends StatelessWidget {
 class _Legend extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Row(
-          children: [
-            _dot(const Color(0xFF00C853)),
-            const SizedBox(width: 4),
-            const Text('Available', style: TextStyle(fontSize: 12, color: Colors.grey)),
-            const SizedBox(width: 16),
-            _dot(const Color(0xFFFF1744)),
-            const SizedBox(width: 4),
-            const Text('Booked', style: TextStyle(fontSize: 12, color: Colors.grey)),
-            const Spacer(),
-            Icon(Icons.refresh_rounded, size: 14, color: Colors.grey[600]),
-            const SizedBox(width: 4),
-            Text('Auto-refresh', style: TextStyle(fontSize: 11, color: Colors.grey[600])),
-          ],
+    padding: const EdgeInsets.symmetric(horizontal: 16),
+    child: Row(
+      children: [
+        _dot(const Color(0xFF00C853)),
+        const SizedBox(width: 4),
+        const Text(
+          'Available',
+          style: TextStyle(fontSize: 12, color: Colors.grey),
         ),
-      );
+        const SizedBox(width: 16),
+        _dot(const Color(0xFFFF1744)),
+        const SizedBox(width: 4),
+        const Text(
+          'Booked',
+          style: TextStyle(fontSize: 12, color: Colors.grey),
+        ),
+        const Spacer(),
+        Icon(Icons.refresh_rounded, size: 14, color: Colors.grey[600]),
+        const SizedBox(width: 4),
+        Text(
+          'Auto-refresh',
+          style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+        ),
+      ],
+    ),
+  );
 
-  Widget _dot(Color c) =>
-      Container(width: 10, height: 10, decoration: BoxDecoration(color: c, shape: BoxShape.circle));
+  Widget _dot(Color c) => Container(
+    width: 10,
+    height: 10,
+    decoration: BoxDecoration(color: c, shape: BoxShape.circle),
+  );
 }
 
 class _BookingSheet extends StatefulWidget {
@@ -317,11 +365,11 @@ class _BookingSheetState extends State<_BookingSheet> {
     if (success) {
       Navigator.pop(context);
       _showSuccessSnackbar();
-      // Send notification
       NotificationService().showBookingConfirmed(
-        widget.venue.name, 
-        '${widget.slot.startTime} – ${widget.slot.endTime}'
+        widget.venue.name,
+        '${widget.slot.startTime} – ${widget.slot.endTime}',
       );
+      widget.slotProvider.refresh(widget.venue.id);
     } else if (bookingProvider.actionState == BookingAction.slotTaken) {
       Navigator.pop(context);
       _showTakenSnackbar();
@@ -342,12 +390,19 @@ class _BookingSheetState extends State<_BookingSheet> {
       SnackBar(
         content: Row(
           children: [
-            const Icon(Icons.check_circle_rounded, color: Colors.black, size: 20),
+            const Icon(
+              Icons.check_circle_rounded,
+              color: Colors.black,
+              size: 20,
+            ),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
                 'Booked ${widget.slot.startTime} – ${widget.slot.endTime}!',
-                style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
+                style: const TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ],
@@ -385,85 +440,103 @@ class _BookingSheetState extends State<_BookingSheet> {
 
   @override
   Widget build(BuildContext context) => Container(
-        decoration: const BoxDecoration(
-          color: Color(0xFF1A1A1A),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-        ),
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            24, 16, 24, MediaQuery.of(context).viewInsets.bottom + 32,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // handle bar
-              Center(
-                child: Container(
-                  width: 40, height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[700],
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
+    decoration: const BoxDecoration(
+      color: Color(0xFF1A1A1A),
+      borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+    ),
+    child: Padding(
+      padding: EdgeInsets.fromLTRB(
+        24,
+        16,
+        24,
+        MediaQuery.of(context).viewInsets.bottom + 32,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // handle bar
+          Center(
+            child: Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[700],
+                borderRadius: BorderRadius.circular(2),
               ),
-              const SizedBox(height: 24),
-              const Text('Confirm Booking',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700)),
-              const SizedBox(height: 24),
-              // booking details card
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF242424),
+            ),
+          ),
+          const SizedBox(height: 24),
+          const Text(
+            'Confirm Booking',
+            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 24),
+          // booking details card
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: const Color(0xFF242424),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFF333333)),
+            ),
+            child: Column(
+              children: [
+                _DetailRow(
+                  icon: Icons.stadium_rounded,
+                  label: widget.venue.name,
+                ),
+                const SizedBox(height: 14),
+                _DetailRow(
+                  icon: Icons.calendar_today_rounded,
+                  label: widget.date,
+                ),
+                const SizedBox(height: 14),
+                _DetailRow(
+                  icon: Icons.access_time_rounded,
+                  label: '${widget.slot.startTime} – ${widget.slot.endTime}',
+                ),
+                const SizedBox(height: 14),
+                _DetailRow(icon: Icons.person_rounded, label: widget.userName),
+              ],
+            ),
+          ),
+          const SizedBox(height: 28),
+          // book button
+          SizedBox(
+            width: double.infinity,
+            height: 56,
+            child: ElevatedButton(
+              onPressed: _loading ? null : _confirm,
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFF333333)),
                 ),
-                child: Column(
-                  children: [
-                    _DetailRow(icon: Icons.stadium_rounded, label: widget.venue.name),
-                    const SizedBox(height: 14),
-                    _DetailRow(icon: Icons.calendar_today_rounded, label: widget.date),
-                    const SizedBox(height: 14),
-                    _DetailRow(
-                      icon: Icons.access_time_rounded,
-                      label: '${widget.slot.startTime} – ${widget.slot.endTime}',
+              ),
+              child: _loading
+                  ? const SizedBox(
+                      height: 22,
+                      width: 22,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.5,
+                        color: Colors.black,
+                      ),
+                    )
+                  : const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.bolt_rounded, size: 20),
+                        SizedBox(width: 8),
+                        Text('Book Now', style: TextStyle(fontSize: 16)),
+                      ],
                     ),
-                    const SizedBox(height: 14),
-                    _DetailRow(icon: Icons.person_rounded, label: widget.userName),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 28),
-              // book button
-              SizedBox(
-                width: double.infinity,
-                height: 56,
-                child: ElevatedButton(
-                  onPressed: _loading ? null : _confirm,
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  ),
-                  child: _loading
-                      ? const SizedBox(
-                          height: 22, width: 22,
-                          child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.black),
-                        )
-                      : const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.bolt_rounded, size: 20),
-                            SizedBox(width: 8),
-                            Text('Book Now', style: TextStyle(fontSize: 16)),
-                          ],
-                        ),
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
-      ).animate().slideY(begin: 0.3, duration: 300.ms, curve: Curves.easeOutCubic);
+        ],
+      ),
+    ),
+  ).animate().slideY(begin: 0.3, duration: 300.ms, curve: Curves.easeOutCubic);
 }
 
 class _DetailRow extends StatelessWidget {
@@ -473,17 +546,23 @@ class _DetailRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: const Color(0xFF00C853).withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(icon, size: 16, color: const Color(0xFF00C853)),
-          ),
-          const SizedBox(width: 14),
-          Text(label, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
-        ],
-      );
+    children: [
+      Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: const Color(0xFF00C853).withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Icon(icon, size: 16, color: const Color(0xFF00C853)),
+      ),
+      const SizedBox(width: 14),
+      Expanded(
+        child: Text(
+          label,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+        ),
+      ),
+    ],
+  );
 }

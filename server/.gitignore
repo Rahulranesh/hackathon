@@ -1,2 +1,4 @@
 node_modules/
 quickslot.db
+quickslot.db-shm
+quickslot.db-wal

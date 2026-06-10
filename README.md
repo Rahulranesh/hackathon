@@ -15,6 +15,12 @@ node --experimental-sqlite index.js
 # SQLite DB is created and seeded on first run
 ```
 
+Run the booking race test:
+```bash
+cd server
+npm run test:concurrency
+```
+
 #### Cloud Deployment (Railway / Render)
 We've included `railway.json` and `render.yaml` for 1-click free-tier deployments.
 - **Render**: Connect your GitHub repo, and Render will automatically use `render.yaml` to deploy.
@@ -45,6 +51,8 @@ Express routes → SQLite via `node:sqlite` (Node.js built-in, no native addon).
 
 **Concurrency approach**: The `bookings` table has `UNIQUE(slot_id, booking_date)`. Two simultaneous `POST /bookings` requests are serialized by SQLite's write lock. The second INSERT throws `errcode 2067` (SQLITE_CONSTRAINT_UNIQUE) which we catch and return `409 Conflict`. No application-level locking needed.
 
+`npm run test:concurrency` opens the Express app on an ephemeral local port, fires two bookings for the same slot/date as different users, and asserts exactly one `201 Created`, one `409 Conflict`, and one row in SQLite.
+
 ### Flutter
 Clean 3-layer architecture:
 - `data/` — models, ApiService (HTTP), repositories (JSON → domain objects)
@@ -56,6 +64,8 @@ Clean 3-layer architecture:
 - **Micro-animations**: Staggered list reveals, hero avatar transitions, and scale-in grids (`flutter_animate`).
 - **Pull-to-refresh**: Available on all data-heavy screens.
 - **Smart Feedback**: Animated bottom sheets and styled floating snackbars.
+- **Live-ish Updates**: Slot grids poll every 10 seconds and refresh immediately after success/conflict.
+- **Local Notification**: Android test notification after a confirmed booking.
 
 `ApiService` returns a sealed `Result<T>` (`Success` / `Failure`). Providers call repositories. Screens call providers. No business logic in widgets.
 
@@ -81,8 +91,9 @@ State management: **Provider** — chosen for simplicity, zero boilerplate, and 
 |-----|--------|
 | JWT auth | Hardcoded users + `X-User-Id` header is sufficient for the demo scope |
 | Pagination | 5 venues × 16 slots fits on one screen |
-| WebSockets | 10s polling achieves the same demo effect with zero infrastructure |
+| WebSockets | 10s polling plus immediate refresh achieves the same demo effect with zero infrastructure |
 | Dockerized backend | Adds 30 min setup cost with no benefit for local demo |
+| Subscriptions | Too much payment surface area for a 6-hour hiring task |
 
 ---
 
@@ -92,7 +103,7 @@ State management: **Provider** — chosen for simplicity, zero boilerplate, and 
 - WebSocket for instant slot updates instead of polling
 - Admin panel to manage venues and slots
 - Recurring slot templates (auto-generate slots daily)
-- Unit tests for the booking concurrency logic
+- Admin dashboard for venue owners
 
 ---
 
