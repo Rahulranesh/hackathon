@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const { initDb } = require('./src/db/schema');
+const { seed } = require('./src/db/seed');
 
 const venueRoutes = require('./src/routes/venues');
 const bookingRoutes = require('./src/routes/bookings');
@@ -13,6 +14,7 @@ app.use(cors());
 app.use(express.json());
 
 initDb();
+seed();
 
 app.use('/venues', venueRoutes);
 app.use('/bookings', bookingRoutes);
