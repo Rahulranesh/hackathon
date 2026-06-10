@@ -15,6 +15,11 @@ node --experimental-sqlite index.js
 # SQLite DB is created and seeded on first run
 ```
 
+#### Cloud Deployment (Railway / Render)
+We've included `railway.json` and `render.yaml` for 1-click free-tier deployments.
+- **Render**: Connect your GitHub repo, and Render will automatically use `render.yaml` to deploy.
+- **Railway**: Connect your repo and it will use `railway.json` and Nixpacks to build.
+
 ### Flutter App
 ```bash
 cd hackathon
@@ -22,7 +27,7 @@ flutter pub get
 flutter run
 ```
 
-> If using a **physical device**: update `lib/core/constants.dart` — change `10.0.2.2` to your laptop's local IP (e.g. `192.168.1.x`).
+> If using a **physical device**: update `lib/core/constants.dart` — change `10.0.2.2` to your laptop's local IP (e.g. `192.168.1.x`) or your deployed Railway/Render URL.
 > If using an **Android emulator**: `10.0.2.2` already maps to your host machine.
 
 ---
@@ -45,6 +50,12 @@ Clean 3-layer architecture:
 - `data/` — models, ApiService (HTTP), repositories (JSON → domain objects)
 - `presentation/providers/` — ChangeNotifier providers, each with `ViewState { idle | loading | data | error }`
 - `presentation/screens/` — widgets, zero HTTP code
+
+**Premium UI Features Added:**
+- **Shimmer Loading**: Custom skeleton loaders (`shimmer` package) for all API calls to avoid jarring spinners.
+- **Micro-animations**: Staggered list reveals, hero avatar transitions, and scale-in grids (`flutter_animate`).
+- **Pull-to-refresh**: Available on all data-heavy screens.
+- **Smart Feedback**: Animated bottom sheets and styled floating snackbars.
 
 `ApiService` returns a sealed `Result<T>` (`Success` / `Failure`). Providers call repositories. Screens call providers. No business logic in widgets.
 

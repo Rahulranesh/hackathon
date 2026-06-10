@@ -4,8 +4,8 @@
   "description": "QuickSlot booking backend",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "node --watch index.js"
+    "start": "node --experimental-sqlite index.js",
+    "dev": "node --watch --experimental-sqlite index.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
