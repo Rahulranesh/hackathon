@@ -7,6 +7,7 @@ import '../widgets/admob_banner.dart';
 import '../widgets/venue_card.dart';
 import '../widgets/skeleton_loaders.dart';
 import '../widgets/app_states.dart';
+import '../../theme/app_theme.dart';
 import 'venue_detail_screen.dart';
 import 'my_bookings_screen.dart';
 import 'login_screen.dart';
@@ -33,107 +34,200 @@ class _VenueListScreenState extends State<VenueListScreen> {
     final provider = context.watch<VenueProvider>();
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         title: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: const Color(0xFF00C853).withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(10),
+              width: 40,
+              height: 40,
+              decoration: AppTheme.primaryGradientBox(radius: 12),
+              child: const Icon(
+                Icons.sports_rounded,
+                size: 20,
+                color: Colors.white,
               ),
-              child: const Icon(Icons.sports_rounded, size: 20, color: Color(0xFF00C853)),
+            )
+            .animate(onPlay: (controller) => controller.repeat())
+            .shimmer(
+              duration: 2000.ms,
+              color: Colors.white.withValues(alpha: 0.3),
             ),
-            const SizedBox(width: 10),
+            const SizedBox(width: 12),
             const Text('QuickSlot'),
           ],
         ),
         actions: [
-          // my bookings button
-          Padding(
-            padding: const EdgeInsets.only(right: 4),
-            child: IconButton(
-              icon: const Icon(Icons.confirmation_num_outlined),
-              tooltip: 'My Bookings',
-              onPressed: () => Navigator.push(
+          IconButton(
+            icon: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppTheme.surface,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: AppTheme.border,
+                ),
+              ),
+              child: const Icon(
+                Icons.confirmation_num_outlined,
+                size: 20,
+              ),
+            ),
+            tooltip: 'My Bookings',
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const MyBookingsScreen()),
+            ),
+          ),
+          IconButton(
+            icon: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppTheme.surface,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: AppTheme.border,
+                ),
+              ),
+              child: const Icon(
+                Icons.logout_rounded,
+                size: 20,
+              ),
+            ),
+            tooltip: 'Logout',
+            onPressed: () {
+              user.logout();
+              Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (_) => const MyBookingsScreen()),
+                MaterialPageRoute(builder: (_) => const LoginScreen()),
+              );
+            },
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              AppTheme.surface.withValues(alpha: 0.3),
+              AppTheme.background,
+            ],
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: MediaQuery.of(context).padding.top + 56),
+            
+            _buildUserGreeting(user),
+            
+            const SizedBox(height: 16),
+            const AdMobBanner(),
+            const SizedBox(height: 16),
+            
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                children: [
+                  Text(
+                    'AVAILABLE VENUES',
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      color: AppTheme.textTertiary,
+                      fontSize: 12,
+                      letterSpacing: 1.5,
+                    ),
+                  ),
+                  const Spacer(),
+                  if (provider.state == ViewState.data)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        gradient: AppTheme.primaryGradient,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        '${provider.venues.length} Venues',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            
+            const SizedBox(height: 12),
+            Expanded(child: _buildBody(provider)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUserGreeting(UserProvider user) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+      child: Row(
+        children: [
+          Hero(
+            tag: 'avatar_${user.userId}',
+            child: Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                gradient: AppTheme.primaryGradient,
+                shape: BoxShape.circle,
+                boxShadow: AppTheme.glowShadow(AppTheme.primary),
+              ),
+              child: Center(
+                child: Text(
+                  user.userName.isNotEmpty ? user.userName[0].toUpperCase() : '?',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
               ),
             ),
           ),
-          // logout
-          Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: IconButton(
-              icon: const Icon(Icons.logout_rounded, size: 20),
-              tooltip: 'Logout',
-              onPressed: () {
-                user.logout();
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (_) => const LoginScreen()),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // greeting + stats
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
-            child: Row(
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Hero(
-                  tag: 'avatar_${user.userId}',
-                  child: CircleAvatar(
-                    backgroundColor: const Color(0xFF00C853),
-                    radius: 18,
-                    child: Text(
-                      user.userName.isNotEmpty ? user.userName[0] : '?',
-                      style: const TextStyle(
-                          color: Colors.black, fontWeight: FontWeight.w700, fontSize: 14),
-                    ),
-                  ),
+                Text(
+                  'Welcome back! 👋',
+                  style: Theme.of(context).textTheme.bodyMedium,
                 ),
-                const SizedBox(width: 12),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Hey ${user.userName}! 👋',
-                      style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
-                    ),
-                    Text(
-                      'Find your perfect court',
-                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                    ),
-                  ],
+                const SizedBox(height: 2),
+                Text(
+                  user.userName,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 8),
-          const AdMobBanner(),
-          // section header
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-            child: Text(
-              'VENUES NEAR YOU',
-              style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 1.5,
-              ),
-            ),
-          ),
-          Expanded(child: _buildBody(provider)),
         ],
       ),
-    );
+    )
+    .animate()
+    .fadeIn(duration: 400.ms)
+    .slideX(begin: -0.2, duration: 400.ms);
   }
 
   Widget _buildBody(VenueProvider provider) {
@@ -144,13 +238,18 @@ class _VenueListScreenState extends State<VenueListScreen> {
           onRetry: () => context.read<VenueProvider>().fetchVenues(),
         ),
       ViewState.data when provider.venues.isEmpty =>
-        const EmptyState(message: 'No venues available', icon: Icons.stadium_outlined),
+        const EmptyState(
+          message: 'No venues available',
+          icon: Icons.stadium_outlined,
+        ),
       ViewState.data => RefreshIndicator(
-          color: const Color(0xFF00C853),
+          color: AppTheme.primary,
+          backgroundColor: AppTheme.cardBg,
           onRefresh: () => context.read<VenueProvider>().fetchVenues(),
           child: ListView.builder(
             physics: const AlwaysScrollableScrollPhysics(),
             itemCount: provider.venues.length,
+            padding: const EdgeInsets.only(bottom: 20),
             itemBuilder: (_, i) => VenueCard(
               venue: provider.venues[i],
               onTap: () => Navigator.push(
@@ -159,7 +258,10 @@ class _VenueListScreenState extends State<VenueListScreen> {
                   builder: (_) => VenueDetailScreen(venue: provider.venues[i]),
                 ),
               ),
-            ).animate().fadeIn(delay: (i * 80).ms, duration: 400.ms).slideY(begin: 0.1),
+            )
+            .animate(delay: (i * 80).ms)
+            .fadeIn(duration: 400.ms)
+            .slideY(begin: 0.1, duration: 400.ms),
           ),
         ),
     };

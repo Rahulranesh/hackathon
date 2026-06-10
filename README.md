@@ -1,6 +1,13 @@
-# QuickSlot
+# QuickSlot 🏸⚽
 
-A sports slot booking app (badminton courts & football turf). Browse venues, pick a date, book a slot — with guaranteed no double-booking.
+> A production-ready sports slot booking app with 3D UI, real-time updates, and guaranteed no double-booking.
+
+**Live Backend**: https://quickslot-backend-ea69.onrender.com  
+**Repository**: https://github.com/Rahulranesh/hackathon  
+**Tech Stack**: Flutter + Node.js + Express + SQLite  
+**Status**: ✅ Deployed & Production Ready
+
+A sports slot booking app (badminton courts & football turf) that lets users browse venues, pick dates, and book slots with absolute confidence that double-bookings cannot happen.
 
 ---
 

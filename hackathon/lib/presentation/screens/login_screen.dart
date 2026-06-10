@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:animated_text_kit/animated_text_kit.dart';
 import '../../data/models/app_user.dart';
 import '../providers/user_provider.dart';
 import '../providers/venue_provider.dart';
 import '../widgets/app_states.dart';
 import '../widgets/skeleton_loaders.dart';
-import '../widgets/card_3d.dart';
 import 'venue_list_screen.dart';
 import '../../theme/app_theme.dart';
 
@@ -18,13 +16,39 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _fadeAnimation;
+  late Animation<Offset> _slideAnimation;
+
   @override
   void initState() {
     super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 1200),
+      vsync: this,
+    );
+    
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+    );
+    
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.1),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
+    
+    _controller.forward();
+    
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<UserProvider>().fetchUsers();
     });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -32,98 +56,98 @@ class _LoginScreenState extends State<LoginScreen> {
     final provider = context.watch<UserProvider>();
 
     return Scaffold(
-      body: AnimatedGradientBackground(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              AppTheme.background,
+              AppTheme.surface.withValues(alpha: 0.5),
+              AppTheme.background,
+            ],
+          ),
+        ),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(32),
+            padding: const EdgeInsets.symmetric(horizontal: 24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 40),
-                // 3D app icon with animated glow
-                Card3D(
-                  width: 80,
-                  height: 80,
-                  child: Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          AppTheme.gradientStart,
-                          AppTheme.gradientEnd,
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppTheme.primary.withValues(alpha: 0.5),
-                          blurRadius: 30,
-                          spreadRadius: 2,
-                        ),
-                      ],
-                    ),
-                    child: const Icon(
-                      Icons.sports_rounded,
-                      size: 48,
-                      color: Colors.white,
-                    ),
+                const SizedBox(height: 60),
+                FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: SlideTransition(
+                    position: _slideAnimation,
+                    child: _buildHeader(),
                   ),
-                )
-                .animate()
-                .fadeIn(duration: 600.ms)
-                .scale(
-                  begin: const Offset(0.5, 0.5),
-                  curve: Curves.elasticOut,
-                  duration: 800.ms,
                 ),
-                const SizedBox(height: 32),
-                // Animated title with typewriter effect
-                Row(
-                  children: [
-                    AnimatedTextKit(
-                      animatedTexts: [
-                        TypewriterAnimatedText(
-                          'QuickSlot',
-                          textStyle: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                            fontWeight: FontWeight.w800,
-                            color: Colors.white,
-                            letterSpacing: -0.5,
-                          ),
-                          speed: const Duration(milliseconds: 150),
-                        ),
-                      ],
-                      totalRepeatCount: 1,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Book sports slots instantly.\nNo waiting, no double-bookings.',
-                  style: TextStyle(
-                    color: Colors.grey[300],
-                    fontSize: 15,
-                    height: 1.5,
-                  ),
-                ).animate().fadeIn(delay: 1200.ms).slideX(begin: -0.1),
-                const SizedBox(height: 56),
-                Text(
-                  'CONTINUE AS',
-                  style: TextStyle(
-                    color: Colors.grey[400],
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 1.5,
-                  ),
-                ).animate().fadeIn(delay: 1400.ms),
-                const SizedBox(height: 16),
+                const SizedBox(height: 48),
                 Expanded(child: _buildUsers(provider)),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // App Icon with gradient
+        Container(
+          width: 72,
+          height: 72,
+          decoration: AppTheme.primaryGradientBox(radius: 20),
+          child: const Icon(
+            Icons.sports_rounded,
+            size: 36,
+            color: Colors.white,
+          ),
+        )
+        .animate(onPlay: (controller) => controller.repeat(reverse: true))
+        .shimmer(
+          duration: 2000.ms,
+          color: Colors.white.withValues(alpha: 0.3),
+        ),
+        
+        const SizedBox(height: 24),
+        
+        // Welcome text
+        Text(
+          'Welcome to',
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+            color: AppTheme.textSecondary,
+          ),
+        ),
+        
+        const SizedBox(height: 4),
+        
+        // App name with gradient
+        ShaderMask(
+          shaderCallback: (bounds) => AppTheme.primaryGradient.createShader(bounds),
+          child: Text(
+            'QuickSlot',
+            style: Theme.of(context).textTheme.displayLarge?.copyWith(
+              color: Colors.white,
+              fontSize: 40,
+            ),
+          ),
+        ),
+        
+        const SizedBox(height: 12),
+        
+        // Subtitle
+        Text(
+          'Book your sports slots instantly\nNo double-booking, guaranteed.',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            height: 1.6,
+            fontSize: 15,
+          ),
+        ),
+      ],
     );
   }
 
@@ -138,128 +162,217 @@ class _LoginScreenState extends State<LoginScreen> {
         message: 'No users found. Start the backend seed first.',
         icon: Icons.person_off_outlined,
       ),
-      ViewState.data => ListView.builder(
-        itemCount: provider.users.length,
-        itemBuilder: (_, i) => _UserTile(user: provider.users[i], index: i),
+      ViewState.data => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'SELECT USER',
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              color: AppTheme.textTertiary,
+              fontSize: 12,
+              letterSpacing: 1.5,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: ListView.builder(
+              itemCount: provider.users.length,
+              padding: EdgeInsets.zero,
+              itemBuilder: (_, i) => _UserCard(
+                user: provider.users[i],
+                index: i,
+              ).animate(delay: (i * 100).ms)
+                .fadeIn(duration: 400.ms)
+                .slideX(begin: 0.2, duration: 400.ms),
+            ),
+          ),
+        ],
       ),
     };
   }
 }
 
-class _UserTile extends StatelessWidget {
+class _UserCard extends StatefulWidget {
   final AppUser user;
   final int index;
-  const _UserTile({required this.user, required this.index});
+  
+  const _UserCard({required this.user, required this.index});
 
-  static const _colors = [
-    AppTheme.gradientStart,
-    AppTheme.gradientEnd,
-    AppTheme.accent,
-  ];
-  static const _icons = [Icons.person, Icons.person_outline, Icons.face];
+  @override
+  State<_UserCard> createState() => _UserCardState();
+}
+
+class _UserCardState extends State<_UserCard> with SingleTickerProviderStateMixin {
+  late AnimationController _scaleController;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _scaleController = AnimationController(
+      duration: const Duration(milliseconds: 150),
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
+      CurvedAnimation(parent: _scaleController, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _scaleController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final color = _colors[index % _colors.length];
+    final colors = [
+      AppTheme.primary,
+      AppTheme.success,
+      AppTheme.accent,
+    ];
+    final color = colors[widget.index % colors.length];
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
-      child: Card3D(
-        width: double.infinity,
-        height: 90,
-        onTap: () {
-          context.read<UserProvider>().login(user.id, user.name);
-          Navigator.pushReplacement(
-            context,
-            PageRouteBuilder(
-              pageBuilder: (_, a, secondaryAnimation) => const VenueListScreen(),
-              transitionsBuilder: (_, a, secondaryAnimation, child) =>
-                  FadeTransition(opacity: a, child: child),
-              transitionDuration: const Duration(milliseconds: 400),
+      child: ScaleTransition(
+        scale: _scaleAnimation,
+        child: GestureDetector(
+          onTapDown: (_) => _scaleController.forward(),
+          onTapUp: (_) {
+            _scaleController.reverse();
+            _handleLogin(context);
+          },
+          onTapCancel: () => _scaleController.reverse(),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: AppTheme.cardBg,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: color.withValues(alpha: 0.3),
+                width: 1.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: color.withValues(alpha: 0.15),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
+              ],
             ),
-          );
-        },
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: AppTheme.glassMorphism,
-          child: Row(
-            children: [
-              Hero(
-                tag: 'avatar_${user.id}',
-                child: Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors: [color, color.withValues(alpha: 0.7)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
+            child: Row(
+              children: [
+                // Avatar with gradient
+                Hero(
+                  tag: 'avatar_${widget.user.id}',
+                  child: Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          color,
+                          color.withValues(alpha: 0.7),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: color.withValues(alpha: 0.3),
+                          blurRadius: 15,
+                          spreadRadius: 2,
+                        ),
+                      ],
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: color.withValues(alpha: 0.4),
-                        blurRadius: 15,
-                        spreadRadius: 2,
+                    child: Center(
+                      child: Text(
+                        widget.user.name[0].toUpperCase(),
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                
+                const SizedBox(width: 16),
+                
+                // User info
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.user.name,
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        widget.user.phone ?? 'User ${widget.user.id}',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          fontSize: 13,
+                        ),
                       ),
                     ],
                   ),
-                  child: CircleAvatar(
-                    backgroundColor: Colors.transparent,
-                    radius: 28,
-                    child: Icon(
-                      _icons[index % _icons.length],
-                      color: Colors.white,
-                      size: 26,
+                ),
+                
+                // Arrow icon with gradient
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        color.withValues(alpha: 0.2),
+                        color.withValues(alpha: 0.1),
+                      ],
                     ),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    Icons.arrow_forward_rounded,
+                    color: color,
+                    size: 20,
                   ),
                 ),
-              ),
-              const SizedBox(width: 18),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      user.name,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      user.phone ?? 'User ${user.id}',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey[400],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [color.withValues(alpha: 0.3), color.withValues(alpha: 0.1)],
-                  ),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  Icons.arrow_forward_rounded,
-                  size: 22,
-                  color: color,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
-    )
-    .animate()
-    .fadeIn(delay: (1600 + index * 120).ms, duration: 400.ms)
-    .slideX(begin: 0.15, delay: (1600 + index * 120).ms, duration: 400.ms)
-    .shimmer(delay: (2000 + index * 120).ms, duration: 1500.ms);
+    );
+  }
+
+  void _handleLogin(BuildContext context) {
+    context.read<UserProvider>().login(widget.user.id, widget.user.name);
+    Navigator.pushReplacement(
+      context,
+      PageRouteBuilder(
+        pageBuilder: (_, animation, __) => const VenueListScreen(),
+        transitionsBuilder: (_, animation, __, child) {
+          return FadeTransition(
+            opacity: animation,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0.1, 0),
+                end: Offset.zero,
+              ).animate(CurvedAnimation(
+                parent: animation,
+                curve: Curves.easeOutCubic,
+              )),
+              child: child,
+            ),
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 400),
+      ),
+    );
   }
 }
