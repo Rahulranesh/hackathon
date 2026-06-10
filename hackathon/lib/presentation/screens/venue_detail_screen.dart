@@ -117,25 +117,41 @@ class _VenueDetailScreenState extends State<VenueDetailScreen> {
                         widget.venue.address,
                         style: TextStyle(color: Colors.grey[400], fontSize: 13),
                       ),
-                      const SizedBox(height: 4),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: sportColor.withValues(alpha: 0.2),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          widget.venue.sport.toUpperCase(),
+                      if (widget.venue.locality != null) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          widget.venue.locality!,
                           style: TextStyle(
                             color: sportColor,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.8,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
+                      ],
+                      const SizedBox(height: 4),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 6,
+                        children: [
+                          _HeaderPill(
+                            label: widget.venue.sport.toUpperCase(),
+                            color: sportColor,
+                          ),
+                          if (widget.venue.rating != null)
+                            _HeaderPill(
+                              label: widget.venue.reviewCount == null
+                                  ? widget.venue.rating!.toStringAsFixed(1)
+                                  : '${widget.venue.rating!.toStringAsFixed(1)} (${widget.venue.reviewCount})',
+                              color: const Color(0xFFFFB300),
+                              icon: Icons.star_rounded,
+                            ),
+                          if (widget.venue.sourceName != null)
+                            _HeaderPill(
+                              label: widget.venue.sourceName!,
+                              color: const Color(0xFF00C853),
+                              icon: Icons.verified_rounded,
+                            ),
+                        ],
                       ),
                     ],
                   ),
@@ -288,6 +304,45 @@ class _DateStrip extends StatelessWidget {
       ),
     );
   }
+}
+
+class _HeaderPill extends StatelessWidget {
+  final String label;
+  final Color color;
+  final IconData? icon;
+
+  const _HeaderPill({required this.label, required this.color, this.icon});
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+    decoration: BoxDecoration(
+      color: color.withValues(alpha: 0.2),
+      borderRadius: BorderRadius.circular(8),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (icon != null) ...[
+          Icon(icon, color: color, size: 11),
+          const SizedBox(width: 3),
+        ],
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 90),
+          child: Text(
+            label,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: color,
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.8,
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 class _Legend extends StatelessWidget {

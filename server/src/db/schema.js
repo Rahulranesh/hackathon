@@ -13,7 +13,14 @@ function initDb() {
       id        INTEGER PRIMARY KEY AUTOINCREMENT,
       name      TEXT NOT NULL,
       sport     TEXT NOT NULL,
-      address   TEXT NOT NULL
+      address   TEXT NOT NULL,
+      locality  TEXT,
+      rating    REAL,
+      review_count INTEGER,
+      source_name TEXT,
+      source_url TEXT,
+      open_time TEXT DEFAULT '06:00',
+      close_time TEXT DEFAULT '22:00'
     );
 
     CREATE TABLE IF NOT EXISTS slots (
@@ -32,6 +39,21 @@ function initDb() {
       UNIQUE(slot_id, booking_date)
     );
   `);
+
+  ensureVenueColumn('locality', 'TEXT');
+  ensureVenueColumn('rating', 'REAL');
+  ensureVenueColumn('review_count', 'INTEGER');
+  ensureVenueColumn('source_name', 'TEXT');
+  ensureVenueColumn('source_url', 'TEXT');
+  ensureVenueColumn('open_time', "TEXT DEFAULT '06:00'");
+  ensureVenueColumn('close_time', "TEXT DEFAULT '22:00'");
+}
+
+function ensureVenueColumn(name, definition) {
+  const columns = db.prepare('PRAGMA table_info(venues)').all();
+  if (!columns.some((column) => column.name === name)) {
+    db.exec(`ALTER TABLE venues ADD COLUMN ${name} ${definition}`);
+  }
 }
 
 module.exports = { db, initDb };

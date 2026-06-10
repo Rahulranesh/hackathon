@@ -4,6 +4,22 @@ A sports slot booking app (badminton courts & football turf). Browse venues, pic
 
 ---
 
+## Data Note
+
+The backend uses real persisted SQLite data. The starter venues are source-backed Bengaluru venues, not placeholder names: Krishna Premier Badminton Arena, The Bull Ring, Elite Badminton Arena, Golden Leg, and The Majesstine Sports. Venue metadata includes locality and source fields from public venue listings such as Playo, KheloMore, and official venue pages.
+
+Slot availability and bookings are not mocked. They are calculated from the `slots` and `bookings` SQLite tables.
+
+Seed data sources:
+
+- Krishna Premier Badminton Arena: https://playo.co/venues/near-st-johns-medical-college-hospital-bengaluru/krishna-premier-badminton-arena-koramangala-near-st-johns-medical-college-hospital-bengaluru
+- The Bull Ring: https://www.khelomore.com/sports-venues/bengaluru/the-bull-ring-indiranagar/374
+- Elite Badminton Arena: https://playo.co/venues/jp-nagar-7th-phase-bengaluru/elite-badminton-arena-jp-nagar-7th-phase-bengaluru
+- Golden Leg: https://playo.co/venues/koramangala-bengaluru/golden-leg-koramangala-bengaluru
+- The Majesstine Sports: https://www.majesstinesports.com/
+
+---
+
 ## Setup
 
 ### Backend

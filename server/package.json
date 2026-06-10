@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node --experimental-sqlite index.js",
     "dev": "node --watch --experimental-sqlite index.js",
-    "test": "node --experimental-sqlite --test",
+    "test": "node --experimental-sqlite --test --test-concurrency=1",
     "test:concurrency": "node --experimental-sqlite --test test/booking-concurrency.test.js"
   },
   "dependencies": {

@@ -108,6 +108,13 @@ Fields:
 - `name`
 - `sport`
 - `address`
+- `locality`
+- `rating`
+- `reviewCount`
+- `sourceName`
+- `sourceUrl`
+- `openTime`
+- `closeTime`
 
 `Venue.fromJson()` maps backend JSON to Dart object.
 
@@ -411,9 +418,12 @@ Displays:
 
 - Sport icon.
 - Venue name.
+- Locality.
 - Address.
 - Sport badge.
 - Hours badge.
+- Rating when available.
+- Verified source name.
 - Chevron.
 
 Sport color:
@@ -501,4 +511,3 @@ If asked to make a small live change, these are safe places:
 - Change slot tile colors in `app_theme.dart`.
 - Add a new message in `_showTakenSnackbar()`.
 - Add another field to `VenueCard`.
-

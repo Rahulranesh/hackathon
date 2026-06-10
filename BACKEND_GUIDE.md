@@ -53,14 +53,23 @@ Columns:
 - `name`: venue name
 - `sport`: sport type, currently `badminton` or `football`
 - `address`: venue address
+- `locality`: display area such as Koramangala or Indiranagar
+- `rating`: public listing rating where available
+- `review_count`: public listing review count where available
+- `source_name`: public source used for the seed record
+- `source_url`: URL for the public listing
+- `open_time`: venue opening time used by app display
+- `close_time`: venue closing time used by app display
 
-Seeded examples:
+Seeded source-backed examples:
 
-- Smash Arena
-- Green Turf FC
-- Court Kings
-- Premier Grounds
-- Rally Point
+- Krishna Premier Badminton Arena
+- The Bull Ring
+- Elite Badminton Arena
+- Golden Leg
+- The Majesstine Sports
+
+These records are real Bengaluru sports venues seeded into local SQLite so the app can run fully offline during demo while still using non-placeholder venue data.
 
 ### `slots`
 
@@ -384,9 +393,10 @@ Seeds starter data.
 Logic:
 
 1. Check venue count.
-2. If venues already exist, return early.
-3. Insert 5 venues.
-4. For each venue, insert hourly slots from 6 AM to 10 PM.
+2. If the database is empty, insert 5 real Bengaluru venues.
+3. For each venue, insert hourly slots from 6 AM to 10 PM.
+4. If an older local database has the original fake seed names, update those rows in-place.
+5. Ensure every seeded venue has slot rows.
 
 Slot generation:
 
@@ -644,4 +654,3 @@ Safe small changes:
 - Change opening hours by editing the seed slot loop.
 - Add an endpoint filter such as `/venues?sport=badminton`.
 - Add validation to prevent booking past dates.
-
