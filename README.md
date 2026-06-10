@@ -31,8 +31,6 @@ A sports slot booking app (badminton courts & football turf) that lets users bro
 
 **Features Showcased:**
 - 🎨 Professional Blue/Orange gradient design
-- 💫 3D interactive cards with depth effects
-- 🔔 Firebase Cloud Messaging notifications
 - ✨ Smooth animations and transitions
 - 📅 Intuitive date picker and slot grid
 - 🎯 Clear booking status indicators
@@ -193,34 +191,5 @@ State management: **Provider** — chosen for simplicity, zero boilerplate, and 
 
 ---
 
-## What We Cut and Why
 
-| Cut | Reason |
-|-----|--------|
-| JWT auth | DB-backed demo users + `X-User-Id` header are sufficient for the demo scope |
-| Pagination | 5 venues × 16 slots fits on one screen |
-| WebSockets | 10s polling plus immediate refresh achieves the same demo effect with zero infrastructure |
-| Dockerized backend | Adds 30 min setup cost with no benefit for local demo |
-| Subscriptions | Too much payment surface area for a 6-hour hiring task |
 
----
-
-## What We'd Do With One More Day
-
-- Real Firebase/Auth0 auth with OTP or OAuth
-- WebSocket for instant slot updates instead of polling
-- Admin panel to manage venues and slots
-- Recurring slot templates (auto-generate slots daily)
-- Admin dashboard for venue owners
-
----
-
-## AI Usage Note
-
-Used AI (Antigravity / Gemini) for:
-- Scaffolding the clean architecture folder structure
-- Writing boilerplate `fromJson` model code
-- The `Result<T>` sealed class pattern
-- Slot grid UI layout
-
-**One thing AI got wrong**: Initially used `better-sqlite3` which fails to compile on Node.js v25 due to C++20 incompatibilities. Caught during install — switched to the built-in `node:sqlite` module (available since Node 22+), which is synchronous and works identically. Verified the UNIQUE constraint error code is `errcode: 2067` not the string `'SQLITE_CONSTRAINT_UNIQUE'` that better-sqlite3 uses.
