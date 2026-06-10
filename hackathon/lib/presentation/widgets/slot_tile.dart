@@ -10,41 +10,70 @@ class SlotTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = slot.isBooked ? AppTheme.booked : AppTheme.available;
-    final bg = slot.isBooked
-        ? AppTheme.booked.withValues(alpha: 0.12)
-        : AppTheme.available.withValues(alpha: 0.12);
+    final booked = slot.isBooked;
+    final color = booked ? AppTheme.booked : AppTheme.available;
+    final bgColor = booked
+        ? AppTheme.booked.withValues(alpha: 0.08)
+        : AppTheme.available.withValues(alpha: 0.08);
+    final borderColor = booked
+        ? AppTheme.booked.withValues(alpha: 0.3)
+        : AppTheme.available.withValues(alpha: 0.3);
 
     return GestureDetector(
-      onTap: slot.isBooked ? null : onTap,
+      onTap: booked ? null : onTap,
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeInOut,
         decoration: BoxDecoration(
-          color: bg,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withValues(alpha: 0.5)),
+          color: bgColor,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: borderColor, width: 1.5),
+          boxShadow: booked
+              ? []
+              : [
+                  BoxShadow(
+                    color: AppTheme.available.withValues(alpha: 0.08),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
         ),
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              slot.isBooked ? Icons.lock_rounded : Icons.access_time_rounded,
-              color: color,
-              size: 20,
+            // status icon
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                booked ? Icons.lock_rounded : Icons.check_circle_outline_rounded,
+                color: color,
+                size: 16,
+              ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 6),
+            // time
             Text(
               slot.startTime,
               style: TextStyle(
                 color: color,
-                fontWeight: FontWeight.w600,
-                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                fontSize: 13,
               ),
             ),
+            const SizedBox(height: 2),
             Text(
-              slot.isBooked ? 'Booked' : 'Open',
-              style: TextStyle(color: color.withValues(alpha: 0.7), fontSize: 10),
+              booked ? 'Taken' : 'Open',
+              style: TextStyle(
+                color: color.withValues(alpha: 0.7),
+                fontSize: 9,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.5,
+              ),
             ),
           ],
         ),
