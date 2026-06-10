@@ -8,6 +8,7 @@ import '../providers/slot_provider.dart';
 import '../providers/booking_provider.dart';
 import '../providers/user_provider.dart';
 import '../providers/venue_provider.dart';
+import '../../core/notifications.dart';
 import '../widgets/slot_tile.dart';
 import '../widgets/skeleton_loaders.dart';
 import '../widgets/app_states.dart';
@@ -316,6 +317,11 @@ class _BookingSheetState extends State<_BookingSheet> {
     if (success) {
       Navigator.pop(context);
       _showSuccessSnackbar();
+      // Send notification
+      NotificationService().showBookingConfirmed(
+        widget.venue.name, 
+        '${widget.slot.startTime} – ${widget.slot.endTime}'
+      );
     } else if (bookingProvider.actionState == BookingAction.slotTaken) {
       Navigator.pop(context);
       _showTakenSnackbar();

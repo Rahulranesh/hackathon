@@ -10,8 +10,14 @@ import 'presentation/providers/booking_provider.dart';
 import 'presentation/screens/login_screen.dart';
 import 'theme/app_theme.dart';
 
-void main() {
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'core/notifications.dart';
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await MobileAds.instance.initialize();
+  await NotificationService().init();
+  
   final api = ApiService();
   final venueRepo = VenueRepository(api);
   final bookingRepo = BookingRepository(api);

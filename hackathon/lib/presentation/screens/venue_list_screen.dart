@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../providers/venue_provider.dart';
 import '../providers/user_provider.dart';
+import '../widgets/admob_banner.dart';
 import '../widgets/venue_card.dart';
 import '../widgets/skeleton_loaders.dart';
 import '../widgets/app_states.dart';
@@ -115,6 +116,7 @@ class _VenueListScreenState extends State<VenueListScreen> {
             ),
           ),
           const SizedBox(height: 8),
+          const AdMobBanner(),
           // section header
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
